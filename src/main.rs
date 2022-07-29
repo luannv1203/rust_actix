@@ -1,0 +1,29 @@
+
+use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::Data};
+use apis::user_apis::{create_user, get_user};
+use repository::mongodb_repo::MongoRepo;
+mod apis;
+mod models;
+mod repository;
+mod enums;
+
+#[get("/")]
+async fn hello() -> impl Responder {
+	HttpResponse::Ok().json("Hello from rust and mongoDB")
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+	let db = MongoRepo::init().await;
+	let db_data = Data::new(db);
+  HttpServer::new(move || 
+		App::new()
+			.app_data(db_data.clone())
+			.service(hello)
+			.service(create_user)
+			.service(get_user)
+		)
+		.bind(("localhost", 8080))?
+		.run()
+		.await
+}

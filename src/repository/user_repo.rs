@@ -1,10 +1,10 @@
-use mongodb::{results::InsertOneResult, bson::{oid::ObjectId, doc}, Collection};
+use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection};
 use std::{fmt::Error};
 
 use crate::models::user_model::User;
 
 
-pub async fn create_user_repo(db: &Collection<User>, new_user: User) -> Result<InsertOneResult, Error> {
+pub async fn create_user_repo(db: &Collection<User>, new_user: User) -> Result<Bson, Error> {
   let new_doc = User{
     id: None,
     name: new_user.name,
@@ -16,7 +16,7 @@ pub async fn create_user_repo(db: &Collection<User>, new_user: User) -> Result<I
     .await
     .ok()
     .expect("Error creating user");
-    Ok(user)
+    Ok(user.inserted_id)
 }
 
 pub async fn get_user_repo(db: &Collection<User>, id: &String) -> Result<User, Error> {

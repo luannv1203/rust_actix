@@ -1,5 +1,5 @@
 
-use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::Data};
+use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::{Data, self}};
 use apis::user_apis::{create_user, get_user};
 use repository::mongodb_repo::MongoRepo;
 mod apis;
@@ -19,9 +19,12 @@ async fn main() -> std::io::Result<()> {
   HttpServer::new(move || 
 		App::new()
 			.app_data(db_data.clone())
-			.service(hello)
-			.service(create_user)
-			.service(get_user)
+			.service(
+				web::scope("/api/v1")
+				.service(hello)
+				.service(create_user)
+				.service(get_user)
+			)
 		)
 		.bind(("localhost", 8080))?
 		.run()

@@ -1,4 +1,5 @@
 use actix_web::{post, web::{Data, Json, self}, HttpResponse, get};
+use serde::{Serialize, Deserialize};
 
 use crate::{
   repository::{
@@ -11,6 +12,13 @@ use crate::{
   },
   enums::status::{status_number, Status}
 };
+#[derive(Debug, Serialize, Deserialize)]
+struct UserResponse {
+  id: String,
+  name: String,
+  location: String,
+  title: String
+}
 
 #[post("/user")]
 pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpResponse {
@@ -22,10 +30,10 @@ pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpRespon
   };
   let user_data = create_user_repo(&&db.user, data).await;
   match user_data {
-    Ok(users) => HttpResponse::Ok().json(
+    Ok(user) => HttpResponse::Ok().json(
       Response::new(
         status_number(Status::OK),
-        Some(users),
+        user,
         String::from("Create user success!"),
         200
       )
@@ -52,7 +60,12 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
     Ok(user) => HttpResponse::Ok().json(
       Response::new(
         status_number(Status::OK),
-        Some(user),
+        UserResponse {
+          id: user.id.unwrap().to_hex(),
+          name: user.name,
+          location: user.location,
+          title: user.title,
+        },
         String::new(),
         200
       )

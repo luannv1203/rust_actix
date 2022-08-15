@@ -1,4 +1,4 @@
-use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection};
+use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection, results::UpdateResult};
 use std::{fmt::Error};
 use futures::stream::TryStreamExt;
 
@@ -38,9 +38,29 @@ pub async fn get_list_user_repo(db: &Collection<User>) -> Result<Vec<UserRespons
     .try_next()
     .await
     .ok()
-    .expect("Error mapping through cursor")
+    .expect("Get List User Failed!")
   {
     users.push(UserResponse::new(user))
   }
   Ok(users)
+}
+
+pub async fn update_user_repo(db: &Collection<User>, id: &String, new_user: User) -> Result<UpdateResult, Error> {
+  let obj_id = ObjectId::parse_str(id).unwrap();
+  let filter = doc! {"_id": obj_id};
+  let new_doc = doc! {
+    "$set":
+      {
+        "id": new_user.id,
+        "name": new_user.name,
+        "location": new_user.location,
+        "title": new_user.title
+      },
+  };
+  let updated_doc = db
+    .update_one(filter, new_doc, None)
+    .await
+    .ok()
+    .expect("Error updating user");
+  Ok(updated_doc)
 }

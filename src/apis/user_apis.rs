@@ -1,24 +1,16 @@
 use actix_web::{post, web::{Data, Json, self}, HttpResponse, get};
-use serde::{Serialize, Deserialize};
 
 use crate::{
   repository::{
     mongodb_repo::MongoRepo,
-    user_repo::{create_user_repo, get_user_repo}
+    user_repo::{create_user_repo, get_user_repo, get_list_user_repo}
   },
   models::{
     user_model::User,
     response::Response
   },
-  enums::status::{status_number, Status}
+  enums::{status::{Status}, message::Message}, responses::user_response::UserResponse
 };
-#[derive(Debug, Serialize, Deserialize)]
-struct UserResponse {
-  id: String,
-  name: String,
-  location: String,
-  title: String
-}
 
 #[post("/user")]
 pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpResponse {
@@ -32,9 +24,9 @@ pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpRespon
   match user_data {
     Ok(user) => HttpResponse::Ok().json(
       Response::new(
-        status_number(Status::OK),
+        Status::new(Status::OK),
         user,
-        String::from("Create user success!"),
+        Message::new(Message::MSG_CREATE_USER_SUCCESS),
         200
       )
     ),
@@ -48,10 +40,10 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
   if id.is_empty() {
     return HttpResponse::Ok().json(
       Response::new(
-        status_number(Status::OK),
+        Status::new(Status::OK),
         None::<User>,
         String::new(),
-        status_number(Status::BadRequest)
+        Status::new(Status::BadRequest)
       )
     )
   }
@@ -59,24 +51,35 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
   match user_detail {
     Ok(user) => HttpResponse::Ok().json(
       Response::new(
-        status_number(Status::OK),
-        UserResponse {
-          id: user.id.unwrap().to_hex(),
-          name: user.name,
-          location: user.location,
-          title: user.title,
-        },
+        Status::new(Status::OK),
+        UserResponse::new(user),
         String::new(),
         200
       )
     ),
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        status_number(Status::InternalServerError),
+        Status::new(Status::InternalServerError),
         None::<User>,
         err.to_string(),
         200
       )
     ),
+  }
+}
+
+#[get("/users")]
+pub async fn get_list_user(db: Data<MongoRepo>) -> HttpResponse {
+  let users = get_list_user_repo(&&db.user).await;
+  match users {
+    Ok(users) => HttpResponse::Ok().json(users),
+    Err(err) => HttpResponse::InternalServerError().json(
+      Response::new(
+        Status::new(Status::InternalServerError),
+        None::<User>,
+        err.to_string(),
+        200
+      )
+    )
   }
 }

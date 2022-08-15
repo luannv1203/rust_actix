@@ -1,7 +1,8 @@
 use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection};
 use std::{fmt::Error};
+use futures::stream::TryStreamExt;
 
-use crate::models::user_model::User;
+use crate::{models::user_model::User, responses::user_response::UserResponse};
 
 
 pub async fn create_user_repo(db: &Collection<User>, new_user: User) -> Result<Bson, Error> {
@@ -28,4 +29,18 @@ pub async fn get_user_repo(db: &Collection<User>, id: &String) -> Result<User, E
     .ok()
     .expect("Error getting user's detail");
   Ok(user_detail.unwrap())
+}
+
+pub async fn get_list_user_repo(db: &Collection<User>) -> Result<Vec<UserResponse>, Error> {
+  let mut cursors = db.find(None, None).await.ok().expect("Get Failed!");
+  let mut users: Vec<UserResponse> = Vec::new();
+  while let Some(user) = cursors
+    .try_next()
+    .await
+    .ok()
+    .expect("Error mapping through cursor")
+  {
+    users.push(UserResponse::new(user))
+  }
+  Ok(users)
 }

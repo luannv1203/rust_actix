@@ -1,11 +1,13 @@
 
 use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::{Data, self}};
-use apis::user_apis::{create_user, get_user};
+use apis::user_apis::{create_user, get_user, get_list_user};
 use repository::mongodb_repo::MongoRepo;
 mod apis;
 mod models;
 mod repository;
 mod enums;
+mod responses;
+// mod middlewares;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -24,6 +26,7 @@ async fn main() -> std::io::Result<()> {
 				.service(hello)
 				.service(create_user)
 				.service(get_user)
+				.service(get_list_user)
 			)
 		)
 		.bind(("localhost", 8080))?

@@ -12,6 +12,7 @@ actix-cors = "0.6.1"
 serde = "1.0.136"
 dotenv = "0.15.0"
 futures = "0.3"
+actix-session = { version = "0.7.1", features = ["cookie-session"] }
 
 [dependencies.mongodb]
 version = "2.2.0"

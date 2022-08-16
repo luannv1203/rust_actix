@@ -1,6 +1,6 @@
 
 use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::{Data, self}};
-use apis::user_apis::{create_user, get_user, get_list_user, update_user};
+use apis::user_apis::{init_routes_user};
 use repository::mongodb_repo::MongoRepo;
 mod apis;
 mod models;
@@ -23,11 +23,7 @@ async fn main() -> std::io::Result<()> {
 			.app_data(db_data.clone())
 			.service(
 				web::scope("/api/v1")
-				.service(hello)
-				.service(create_user)
-				.service(get_user)
-				.service(get_list_user)
-				.service(update_user)
+				.service(web::scope("/user").configure(init_routes_user))
 			)
 		)
 		.bind(("localhost", 8080))?

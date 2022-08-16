@@ -13,7 +13,7 @@ use crate::{
   enums::{status::{Status}, message::Message}, responses::user_response::UserResponse
 };
 
-#[post("/user")]
+#[post("/")]
 pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpResponse {
   let data = User {
     id: None,
@@ -35,10 +35,9 @@ pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpRespon
   }
 }
 
-#[get("/user/{id}")]
+#[get("/{id}")]
 pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpResponse {
   let id = path.into_inner();
-  println!("{}", id);
   if id.is_empty() {
     return HttpResponse::Ok().json(
       Response::new(
@@ -70,7 +69,7 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
   }
 }
 
-#[get("/users")]
+#[get("/list")]
 pub async fn get_list_user(db: Data<MongoRepo>) -> HttpResponse {
   let users = get_list_user_repo(&&db.user).await;
   match users {
@@ -86,7 +85,7 @@ pub async fn get_list_user(db: Data<MongoRepo>) -> HttpResponse {
   }
 }
 
-#[put("/user/{id}")]
+#[put("/{id}")]
 pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user: Json<User>) -> HttpResponse {
   let id = path.into_inner();
   if id.is_empty() {
@@ -143,4 +142,11 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
       )
     ),
   }
+}
+
+pub fn init_routes_user(cfg: &mut web::ServiceConfig) {
+  cfg.service(create_user);
+  cfg.service(get_list_user);
+  cfg.service(get_user);
+  cfg.service(update_user);
 }

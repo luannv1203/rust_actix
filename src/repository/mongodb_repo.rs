@@ -4,10 +4,11 @@ use dotenv::dotenv;
 
 use mongodb::{Collection, Client};
 
-use crate::models::user_model::User;
+use crate::models::{user_model::User, admin_model::Admin};
 
 pub struct MongoRepo {
-  pub user: Collection<User>
+  pub user: Collection<User>,
+  pub admin: Collection<Admin>
 }
 
 impl MongoRepo {
@@ -21,9 +22,11 @@ impl MongoRepo {
     println!("Mongodb Connected!");
     let db = client.database("luannv");
     let user = db.collection("User");
+    let admin = db.collection("admins");
 
     MongoRepo {
-      user: user
+      user: user,
+      admin: admin
     }
   }
 }

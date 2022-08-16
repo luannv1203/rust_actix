@@ -1,6 +1,6 @@
 
 use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::{Data, self}};
-use apis::user_apis::{init_routes_user};
+use apis::{user_apis::{init_routes_user}, auth_apis::init_routes_auth};
 use repository::mongodb_repo::MongoRepo;
 mod apis;
 mod models;
@@ -24,6 +24,7 @@ async fn main() -> std::io::Result<()> {
 			.service(
 				web::scope("/api/v1")
 				.service(web::scope("/user").configure(init_routes_user))
+				.service(web::scope("/auth").configure(init_routes_auth))
 			)
 		)
 		.bind(("localhost", 8080))?

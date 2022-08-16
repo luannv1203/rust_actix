@@ -1,10 +1,10 @@
-use actix_web::{post, web::{Data, Json, self}, HttpResponse, get, put};
+use actix_web::{post, web::{Data, Json, self}, HttpResponse, get, put, delete};
 use mongodb::bson::oid::ObjectId;
 
 use crate::{
   repository::{
     mongodb_repo::MongoRepo,
-    user_repo::{create_user_repo, get_user_repo, get_list_user_repo, update_user_repo}
+    user_repo::{create_user_repo, get_user_repo, get_list_user_repo, update_user_repo, delete_user_repo}
   },
   models::{
     user_model::User,
@@ -144,9 +144,57 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
   }
 }
 
+#[delete("/{id}")]
+pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpResponse {
+  let id = path.into_inner();
+  if id.is_empty() {
+    return HttpResponse::Ok().json(
+      Response::new(
+        Status::new(Status::OK),
+        None::<User>,
+        String::new(),
+        Status::new(Status::BAD_REQUEST)
+      )
+    )
+  }
+  let result = delete_user_repo(&db.user, &id).await;
+  match result {
+    Ok(res) => {
+      if res.deleted_count == 1 {
+        return HttpResponse::Ok().json(
+          Response::new(
+            Status::new(Status::OK),
+            None::<User>,
+            String::from("User successfully deleted!"),
+            Status::new(Status::OK)
+          )
+        )
+      } else {
+        return HttpResponse::Ok().json(
+          Response::new(
+            Status::new(Status::INTERNAL_SERVER_ERROR),
+            None::<User>,
+            String::from("User with specified ID not found!"),
+            Status::new(Status::INTERNAL_SERVER_ERROR),
+          )
+        )
+      }
+    }
+    Err(err) => HttpResponse::InternalServerError().json(
+      Response::new(
+        Status::new(Status::INTERNAL_SERVER_ERROR),
+        None::<User>,
+        err.to_string(),
+        Status::new(Status::INTERNAL_SERVER_ERROR),
+      )
+    )
+  }
+}
+
 pub fn init_routes_user(cfg: &mut web::ServiceConfig) {
   cfg.service(create_user);
   cfg.service(get_list_user);
   cfg.service(get_user);
   cfg.service(update_user);
+  cfg.service(delete_user);
 }

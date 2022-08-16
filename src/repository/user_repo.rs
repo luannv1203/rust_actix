@@ -1,4 +1,4 @@
-use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection, results::UpdateResult};
+use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection, results::{UpdateResult, DeleteResult}};
 use std::{fmt::Error};
 use futures::stream::TryStreamExt;
 
@@ -63,4 +63,15 @@ pub async fn update_user_repo(db: &Collection<User>, id: &String, new_user: User
     .ok()
     .expect("Error updating user");
   Ok(updated_doc)
+}
+
+pub async fn delete_user_repo(db: &Collection<User>, id: &String) -> Result<DeleteResult, Error> {
+  let obj_id = ObjectId::parse_str(id).unwrap();
+  let filter = doc! {"_id": obj_id};
+  let user = db
+    .delete_one(filter, None)
+    .await
+    .ok()
+    .expect("Error Deleted Fail!");
+  Ok(user)
 }

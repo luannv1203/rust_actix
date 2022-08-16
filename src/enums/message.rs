@@ -6,8 +6,8 @@ pub enum Message {
 }
 
 impl Message {
-  pub fn new(mess: Message) -> String {
-    match mess {
+  pub fn new(self) -> String {
+    match self {
       Message::MSG_CREATE_USER_SUCCESS => String::from("Create User Successfully!"),
       Message::MSG_UPDATE_USER_SUCCESS => String::from("Update User Successfully!"),
     }

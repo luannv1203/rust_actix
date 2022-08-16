@@ -44,7 +44,7 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
         Status::new(Status::OK),
         None::<User>,
         String::new(),
-        Status::new(Status::BadRequest)
+        Status::new(Status::BAD_REQUEST)
       )
     )
   }
@@ -60,7 +60,7 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
     ),
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::InternalServerError),
+        Status::new(Status::INTERNAL_SERVER_ERROR),
         None::<User>,
         err.to_string(),
         200
@@ -76,7 +76,7 @@ pub async fn get_list_user(db: Data<MongoRepo>) -> HttpResponse {
     Ok(users) => HttpResponse::Ok().json(users),
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::InternalServerError),
+        Status::new(Status::INTERNAL_SERVER_ERROR),
         None::<Vec<UserResponse>>,
         err.to_string(),
         200
@@ -94,7 +94,7 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
         Status::new(Status::OK),
         None::<UserResponse>,
         String::new(),
-        Status::new(Status::BadRequest)
+        Status::new(Status::BAD_REQUEST)
       )
     )
   };
@@ -122,7 +122,7 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
             ),
             Err(err) => HttpResponse::InternalServerError().json(
               Response::new(
-                Status::new(Status::InternalServerError),
+                Status::new(Status::INTERNAL_SERVER_ERROR),
                 None::<User>,
                 err.to_string(),
                 200,
@@ -135,7 +135,7 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
     }
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::InternalServerError),
+        Status::new(Status::INTERNAL_SERVER_ERROR),
         None::<User>,
         err.to_string(),
         200

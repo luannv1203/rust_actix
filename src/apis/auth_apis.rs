@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, post, web::{Data, Json, self}};
 use chrono::{Utc, DateTime, Duration};
-use crypto::{sha2::Sha256, digest::Digest};
+use crypto::{sha2::{Sha256}, digest::Digest};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Serialize, Deserialize};
 use crate::{repository::{mongodb_repo::MongoRepo, admin_repo::get_user_by_email}, enums::status::Status, models::response::Response, responses::{login_response::LoginResponse}};
@@ -12,7 +12,7 @@ pub struct LoginRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Claims {
+pub struct Claims {
   sub: String,
   exp: usize
 }
@@ -23,9 +23,11 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
   match admin {
     Some(x) => {
       let mut sha = Sha256::new();
+      // let mut rsa = 
       sha.input_str(&data.password);
-      println!("{:?}", sha.result_str());
-      if x.password.to_lowercase() == sha.result_str() {
+      println!("{:?}", sha.result_str().to_lowercase());
+      println!("{:?}", x.password);
+      if x.password.to_lowercase() == sha.result_str().to_lowercase() {
         let mut _date: DateTime<Utc>;
         _date = Utc::now() + Duration::hours(1);
         let my_claims = Claims {

@@ -7,7 +7,7 @@ mod models;
 mod repository;
 mod enums;
 mod responses;
-// mod middlewares;
+mod middlewares;
 
 #[get("/")]
 async fn hello() -> impl Responder {

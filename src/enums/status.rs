@@ -3,7 +3,7 @@ pub enum Status {
   OK,
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
-  // Unauthorization,
+  // UNAUTHORIZATION,
 }
 impl Status {
   pub fn new(self) -> u16 {
@@ -11,7 +11,7 @@ impl Status {
       Status::OK => 200,
       Status::BAD_REQUEST => 400,
       Status::INTERNAL_SERVER_ERROR => 500,
-      // Status::Unauthorization => 401
+      // Status::UNAUTHORIZATION => 401
     }
   }
 }

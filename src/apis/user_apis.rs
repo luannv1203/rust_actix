@@ -10,7 +10,7 @@ use crate::{
     user_model::User,
     response::Response
   },
-  enums::{status::{Status}, message::Message}, responses::user_response::UserResponse
+  enums::{status::{Status}, message::Message}, responses::user_response::UserResponse, middlewares::auth_middleware::AuthorizationService
 };
 
 #[post("/")]
@@ -70,7 +70,7 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
 }
 
 #[get("/list")]
-pub async fn get_list_user(db: Data<MongoRepo>) -> HttpResponse {
+pub async fn get_list_user(_: AuthorizationService, db: Data<MongoRepo>) -> HttpResponse {
   let users = get_list_user_repo(&&db.user).await;
   match users {
     Ok(users) => HttpResponse::Ok().json(users),

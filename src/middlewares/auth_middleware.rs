@@ -27,7 +27,7 @@ impl FromRequest for AuthorizationService {
           Err(_e) => err(ErrorUnauthorized(Message::new(Message::MSG_TOKEN_INVALID))),
         }
       }
-      None => err(ErrorUnauthorized(Message::new(Message::MSG_TOKEN_INVALID))),
+      None => err(ErrorUnauthorized::<_>(Message::new(Message::MSG_TOKEN_INVALID))),
     }
   }
 }

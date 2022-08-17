@@ -3,7 +3,7 @@ use chrono::{Utc, DateTime, Duration};
 use crypto::{sha2::{Sha256}, digest::Digest};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Serialize, Deserialize};
-use crate::{repository::{mongodb_repo::MongoRepo, admin_repo::get_user_by_email}, enums::status::Status, models::response::Response, responses::{login_response::LoginResponse}};
+use crate::{repository::{mongodb_repo::MongoRepo, admin_repo::get_user_by_email}, enums::status::Status, responses::{login_response::LoginResponse, response::Response}};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LoginRequest {
@@ -25,8 +25,6 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
       let mut sha = Sha256::new();
       // let mut rsa = 
       sha.input_str(&data.password);
-      println!("{:?}", sha.result_str().to_lowercase());
-      println!("{:?}", x.password);
       if x.password.to_lowercase() == sha.result_str().to_lowercase() {
         let mut _date: DateTime<Utc>;
         _date = Utc::now() + Duration::hours(1);
@@ -44,7 +42,8 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
             Status::new(Status::OK),
             LoginResponse::new(token),
             String::from("Login Success!"),
-            Status::new(Status::OK)
+            Status::new(Status::OK),
+            None
           )
         )
       } else {
@@ -54,6 +53,7 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
             None::<LoginResponse>,
             String::from("Check your user informations!"),
             Status::new(Status::INTERNAL_SERVER_ERROR),
+            None
           )
         )
       }
@@ -65,6 +65,7 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
           None::<LoginResponse>,
           String::from("Check your user informations!"),
           Status::new(Status::INTERNAL_SERVER_ERROR),
+          None
         )
       )
   }

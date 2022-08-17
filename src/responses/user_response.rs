@@ -2,6 +2,13 @@ use serde::{Serialize, Deserialize};
 
 use crate::models::user_model::User;
 
+use super::pagination::Pagination;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserRepoResponse {
+  pub users: Vec<UserResponse>,
+  pub pagination: Pagination
+}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserResponse {
   pub id: String,

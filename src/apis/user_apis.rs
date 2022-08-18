@@ -15,7 +15,7 @@ use crate::{
 
 #[derive(Debug, Deserialize)]
 pub struct QueryParams {
-  pub id: Option<String>,
+  pub title: Option<String>,
   pub name: Option<String>,
   pub size: Option<i64>,
   pub page: Option<i64>

@@ -32,18 +32,21 @@ pub async fn get_user_repo(db: &Collection<User>, id: &String) -> Result<User, E
   Ok(user_detail.unwrap())
 }
 
+fn string_query_like(param: &Option<String>) -> String {
+  let mut str = String::new();
+  str.push_str(".*");
+  str.push_str(param.as_ref().unwrap_or(&String::new()));
+  str.push_str(".*");
+  str
+}
+
 pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryParams>) -> Result<RepoResponseWithPagination<UserResponse>, Error> {
-  
-  let filter;
-  if let Some(id) = &query.id {
-    let obj_id: ObjectId = ObjectId::parse_str(id).unwrap();
-    filter = doc! {"_id": obj_id};
-  } else {
-    filter = doc! {};
-  }
+  let name = string_query_like(&query.name);
+  let title = string_query_like(&query.title);
+  let filter = doc! {"name": {"$regex": name}, "title": {"$regex": title} };
   let v = filter.clone();
 
-  let limit = query.size.unwrap_or(3);
+  let limit = query.size.unwrap_or(10);
   let page = query.page.unwrap_or(1);
 
   let find_options = FindOptions::builder()

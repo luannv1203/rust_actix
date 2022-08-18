@@ -10,7 +10,7 @@ use crate::{
   models::{
     user_model::User,
   },
-  enums::{status::{Status}, message::Message}, responses::{user_response::UserResponse, response::Response},
+  enums::{status::{Status}, message::Message}, responses::{user_response::UserResponse, response::{Response, ResponseWithPagination}},
 };
 
 #[derive(Debug, Deserialize)]
@@ -37,7 +37,6 @@ pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpRespon
         user,
         Message::new(Message::MSG_CREATE_USER_SUCCESS),
         200,
-        None
       )
     ),
     Err(err) => HttpResponse::InternalServerError().body(err.to_string())
@@ -54,7 +53,6 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
         None::<User>,
         String::new(),
         Status::new(Status::BAD_REQUEST),
-        None
       )
     )
   }
@@ -66,7 +64,6 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
         UserResponse::new(user),
         String::new(),
         200,
-        None
       )
     ),
     Err(err) => HttpResponse::InternalServerError().json(
@@ -75,7 +72,6 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
         None::<User>,
         err.to_string(),
         200,
-        None
       )
     ),
   }
@@ -90,9 +86,9 @@ pub async fn get_list_user(
   let users_repo = get_list_user_repo(&db.user, query).await;
   match users_repo {
     Ok(users_res) => HttpResponse::Ok().json(
-      Response::new(
+      ResponseWithPagination::new(
         Status::new(Status::OK),
-        users_res.users,
+        users_res.data,
         String::new(),
         Status::new(Status::OK),
         Some(users_res.pagination)
@@ -104,7 +100,6 @@ pub async fn get_list_user(
         None::<Vec<UserResponse>>,
         err.to_string(),
         200,
-        None
       )
     )
   }
@@ -120,7 +115,6 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
         None::<UserResponse>,
         String::new(),
         Status::new(Status::BAD_REQUEST),
-        None
       )
     )
   };
@@ -144,7 +138,6 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
                 UserResponse::new(user),
                 Message::new(Message::MSG_UPDATE_USER_SUCCESS),
                 200,
-                None
               )
             ),
             Err(err) => HttpResponse::InternalServerError().json(
@@ -153,7 +146,6 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
                 None::<User>,
                 err.to_string(),
                 200,
-                None
               )
             ),
         };
@@ -167,7 +159,6 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
         None::<User>,
         err.to_string(),
         200,
-        None
       )
     ),
   }
@@ -183,7 +174,6 @@ pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRe
         None::<User>,
         String::new(),
         Status::new(Status::BAD_REQUEST),
-        None
       )
     )
   }
@@ -197,7 +187,6 @@ pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRe
             None::<User>,
             String::from("User successfully deleted!"),
             Status::new(Status::OK),
-            None
           )
         )
       } else {
@@ -207,7 +196,6 @@ pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRe
             None::<User>,
             String::from("User with specified ID not found!"),
             Status::new(Status::INTERNAL_SERVER_ERROR),
-            None
           )
         )
       }
@@ -218,7 +206,6 @@ pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRe
         None::<User>,
         err.to_string(),
         Status::new(Status::INTERNAL_SERVER_ERROR),
-        None
       )
     )
   }

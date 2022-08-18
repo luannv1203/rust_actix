@@ -3,7 +3,7 @@ use mongodb::{bson::{oid::ObjectId, doc, Bson}, Collection, results::{UpdateResu
 use std::{fmt::Error};
 use futures::stream::TryStreamExt;
 
-use crate::{models::user_model::User, responses::{user_response::{UserResponse, UserRepoResponse}, pagination::Pagination}, apis::user_apis::QueryParams};
+use crate::{models::user_model::User, responses::{user_response::{UserResponse}, pagination::Pagination, response::RepoResponseWithPagination}, apis::user_apis::QueryParams};
 
 
 pub async fn create_user_repo(db: &Collection<User>, new_user: User) -> Result<Bson, Error> {
@@ -32,7 +32,7 @@ pub async fn get_user_repo(db: &Collection<User>, id: &String) -> Result<User, E
   Ok(user_detail.unwrap())
 }
 
-pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryParams>) -> Result<UserRepoResponse, Error> {
+pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryParams>) -> Result<RepoResponseWithPagination<UserResponse>, Error> {
   
   let filter;
   if let Some(id) = &query.id {
@@ -78,8 +78,8 @@ pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryPa
     total_records: total_record as i64,
     total_pages: total,
   };
-  Ok(UserRepoResponse {
-    users: users,
+  Ok(RepoResponseWithPagination {
+    data: users,
     pagination: pagination
   })
 }

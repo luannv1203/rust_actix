@@ -4,6 +4,8 @@ use crypto::{sha2::{Sha256}, digest::Digest};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Serialize, Deserialize};
 use crate::{repository::{mongodb_repo::MongoRepo, admin_repo::get_user_by_email}, enums::status::Status, responses::{login_response::LoginResponse, response::Response}};
+use std::{env};
+extern crate dotenv;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LoginRequest {
@@ -20,6 +22,7 @@ pub struct Claims {
 #[post("/login")]
 pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpResponse {
   let admin = get_user_by_email(&db.admin, &data.email).await.unwrap();
+  let secet_key = env::var("SECRET_KEY").unwrap();
   match admin {
     Some(x) => {
       let mut sha = Sha256::new();
@@ -35,7 +38,7 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
         let token = encode(
           &Header::default(),
           &my_claims,
-          &EncodingKey::from_secret("abcdefgh".as_bytes()),
+          &EncodingKey::from_secret(secet_key.as_bytes()),
         ).unwrap();
         return HttpResponse::Ok().json(
           Response::new(

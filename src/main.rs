@@ -1,4 +1,10 @@
 
+// use std::sync::Mutex;
+// use std::sync::Arc;
+// use std::thread;
+
+use std::{sync::{Arc, Mutex}, thread};
+
 use actix_web::{Responder, HttpResponse, get, HttpServer, App, web::{Data, self}};
 use apis::{user_apis::{init_routes_user}, auth_apis::init_routes_auth};
 use repository::mongodb_repo::MongoRepo;
@@ -16,6 +22,21 @@ async fn hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+	let myData ="phocode.com";
+	let myArcData = Arc::new(Mutex::new(myData)); 
+	let myMutex1 = myArcData.clone();
+	thread::spawn(move || {
+		let lockResult = myMutex1.lock();
+		match lockResult {
+			Ok(myData) => {
+				println!("Locking OK, here is the data: {}", myData)
+			},
+			Err(error) => {
+				println!("Locking failed: {}", error);
+			}
+		}
+	});
+
 	let db = MongoRepo::init().await;
 	let db_data = Data::new(db);
   HttpServer::new(move || 

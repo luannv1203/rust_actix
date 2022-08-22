@@ -21,7 +21,7 @@ impl MongoRepo {
     let client = Client::with_uri_str(uri).await.unwrap();
     println!("Mongodb Connected!");
     let db = client.database("luannv");
-    let user = db.collection("User");
+    let user = db.collection("users");
     let admin = db.collection("admins");
 
     MongoRepo {

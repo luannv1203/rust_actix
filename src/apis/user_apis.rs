@@ -29,7 +29,7 @@ pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpRespon
     location: new_doc.location.to_owned(),
     title: new_doc.title.to_owned()
   };
-  let user_data = create_user_repo(&&db.user, data).await;
+  let user_data = create_user_repo(&db.user, data).await;
   match user_data {
     Ok(user) => HttpResponse::Ok().json(
       Response::new(
@@ -56,7 +56,7 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
       )
     )
   }
-  let user_detail = get_user_repo(&&db.user, &id).await;
+  let user_detail = get_user_repo(&db.user, &id).await;
   match user_detail {
     Ok(user) => HttpResponse::Ok().json(
       Response::new(

@@ -44,7 +44,6 @@ pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryPa
   let name = string_query_like(&query.name);
   let title = string_query_like(&query.title);
   let filter = doc! {"name": {"$regex": name}, "title": {"$regex": title} };
-  let v = filter.clone();
 
   let limit = query.size.unwrap_or(10);
   let page = query.page.unwrap_or(1);
@@ -54,7 +53,7 @@ pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryPa
     .skip(u64::try_from((page - 1) * limit).unwrap())
     .build();
   let mut cursors = db
-    .find(filter, find_options)
+    .find(filter.clone(), find_options)
     .await.ok()
     .expect("Get Failed!");
   let mut users: Vec<UserResponse> = Vec::new();
@@ -67,7 +66,7 @@ pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryPa
     users.push(UserResponse::new(user))
   }
 
-  let total_record = db.count_documents(v, None).await.unwrap();
+  let total_record = db.count_documents(filter.clone(), None).await.unwrap();
   let total;
   if (total_record as i64) % limit > 0 {
     total = (((total_record as i64) / limit) as i64) + 1

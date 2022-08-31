@@ -1,17 +1,19 @@
 use serde::{Serialize, Deserialize};
 
+use crate::enums::status::Status;
+
 use super::pagination::Pagination;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Response<T> {
-  status: u16,
+  status: Status,
   data: T,
   message: String,
-  code: u16,
+  code: Status,
 }
 
 impl<T> Response<T> {
-  pub fn new(status: u16, data: T, message: String, code: u16) -> Self {
+  pub fn new(status: Status, data: T, message: String, code: Status) -> Self {
     Response {
       status: status,
       data: data,
@@ -23,15 +25,15 @@ impl<T> Response<T> {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ResponseWithPagination<T> {
-  status: u16,
+  status: Status,
   data: T,
   message: String,
-  code: u16,
+  code: Status,
   pagination: Option<Pagination>
 }
 
 impl<T> ResponseWithPagination<T> {
-  pub fn new(status: u16, data: T, message: String, code: u16, pagination: Option<Pagination>) -> Self {
+  pub fn new(status: Status, data: T, message: String, code: Status, pagination: Option<Pagination>) -> Self {
     ResponseWithPagination {
       status: status,
       data: data,

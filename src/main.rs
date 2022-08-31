@@ -21,6 +21,7 @@ async fn hello() -> impl Responder {
 }
 
 #[actix_web::main]
+#[allow(non_snake_case)]
 async fn main() -> std::io::Result<()> {
 	let myData ="phocode.com";
 	let myArcData = Arc::new(Mutex::new(myData)); 

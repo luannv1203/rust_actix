@@ -3,7 +3,7 @@
 pub enum Message {
   MSG_CREATE_USER_SUCCESS,
   MSG_UPDATE_USER_SUCCESS,
-  MSG_TOKEN_INVALID
+  MSG_TOKEN_INVALID,
 }
 
 impl Message {

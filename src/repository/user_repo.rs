@@ -66,7 +66,7 @@ pub async fn get_list_user_repo(db: &Collection<User>, query: web::Query<QueryPa
     users.push(UserResponse::new(user))
   }
 
-  let total_record = db.count_documents(filter.clone(), None).await.unwrap();
+  let total_record = db.count_documents(filter, None).await.unwrap();
   let total;
   if (total_record as i64) % limit > 0 {
     total = (((total_record as i64) / limit) as i64) + 1

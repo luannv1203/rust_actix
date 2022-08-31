@@ -42,19 +42,19 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
         ).unwrap();
         return HttpResponse::Ok().json(
           Response::new(
-            Status::new(Status::OK),
+            Status::OK(200),
             LoginResponse::new(token),
             String::from("Login Success!"),
-            Status::new(Status::OK),
+            Status::OK(200),
           )
         )
       } else {
         return HttpResponse::Ok().json(
           Response::new(
-            Status::new(Status::OK),
+            Status::OK(200),
             None::<LoginResponse>,
             String::from("Check your user informations!"),
-            Status::new(Status::INTERNAL_SERVER_ERROR),
+            Status::INTERNAL_SERVER_ERROR(500),
           )
         )
       }
@@ -62,10 +62,10 @@ pub async fn login(db: Data<MongoRepo>, data: Json<LoginRequest>) -> HttpRespons
     None => 
       return HttpResponse::Ok().json(
         Response::new(
-          Status::new(Status::OK),
+          Status::OK(200),
           None::<LoginResponse>,
           String::from("Check your user informations!"),
-          Status::new(Status::INTERNAL_SERVER_ERROR),
+          Status::INTERNAL_SERVER_ERROR(500),
         )
       )
   }

@@ -33,10 +33,10 @@ pub async fn create_user(db: Data<MongoRepo>, new_doc: Json<User>) -> HttpRespon
   match user_data {
     Ok(user) => HttpResponse::Ok().json(
       Response::new(
-        Status::new(Status::OK),
+        Status::OK(200),
         user,
         Message::new(Message::MSG_CREATE_USER_SUCCESS),
-        200,
+        Status::OK(200),
       )
     ),
     Err(err) => HttpResponse::InternalServerError().body(err.to_string())
@@ -49,10 +49,10 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
   if id.is_empty() {
     return HttpResponse::Ok().json(
       Response::new(
-        Status::new(Status::OK),
+        Status::OK(200),
         None::<User>,
         String::new(),
-        Status::new(Status::BAD_REQUEST),
+        Status::BAD_REQUEST(400),
       )
     )
   }
@@ -60,18 +60,18 @@ pub async fn get_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRespo
   match user_detail {
     Ok(user) => HttpResponse::Ok().json(
       Response::new(
-        Status::new(Status::OK),
+        Status::OK(200),
         UserResponse::new(user),
         String::new(),
-        200,
+        Status::OK(200),
       )
     ),
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::INTERNAL_SERVER_ERROR),
+        Status::INTERNAL_SERVER_ERROR(500),
         None::<User>,
         err.to_string(),
-        200,
+        Status::OK(200),
       )
     ),
   }
@@ -87,19 +87,19 @@ pub async fn get_list_user(
   match users_repo {
     Ok(users_res) => HttpResponse::Ok().json(
       ResponseWithPagination::new(
-        Status::new(Status::OK),
+        Status::OK(200),
         users_res.data,
         String::new(),
-        Status::new(Status::OK),
+        Status::OK(200),
         Some(users_res.pagination)
       )
     ),
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::INTERNAL_SERVER_ERROR),
+        Status::INTERNAL_SERVER_ERROR(500),
         None::<Vec<UserResponse>>,
         err.to_string(),
-        200,
+        Status::OK(200),
       )
     )
   }
@@ -111,10 +111,10 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
   if id.is_empty() {
     return HttpResponse::Ok().json(
       Response::new(
-        Status::new(Status::OK),
+        Status::OK(200),
         None::<UserResponse>,
         String::new(),
-        Status::new(Status::BAD_REQUEST),
+        Status::BAD_REQUEST(400),
       )
     )
   };
@@ -134,18 +134,18 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
         return match updated_user_info {
             Ok(user) => HttpResponse::Ok().json(
               Response::new(
-                Status::new(Status::OK),
+                Status::OK(200),
                 UserResponse::new(user),
                 Message::new(Message::MSG_UPDATE_USER_SUCCESS),
-                200,
+                Status::OK(200),
               )
             ),
             Err(err) => HttpResponse::InternalServerError().json(
               Response::new(
-                Status::new(Status::INTERNAL_SERVER_ERROR),
+                Status::INTERNAL_SERVER_ERROR(500),
                 None::<User>,
                 err.to_string(),
-                200,
+                Status::OK(200),
               )
             ),
         };
@@ -155,10 +155,10 @@ pub async fn update_user(db: Data<MongoRepo>, path: web::Path<String>, new_user:
     }
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::INTERNAL_SERVER_ERROR),
+        Status::INTERNAL_SERVER_ERROR(500),
         None::<User>,
         err.to_string(),
-        200,
+        Status::OK(200),
       )
     ),
   }
@@ -170,10 +170,10 @@ pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRe
   if id.is_empty() {
     return HttpResponse::Ok().json(
       Response::new(
-        Status::new(Status::OK),
+        Status::OK(200),
         None::<User>,
         String::new(),
-        Status::new(Status::BAD_REQUEST),
+        Status::BAD_REQUEST(400),
       )
     )
   }
@@ -183,29 +183,29 @@ pub async fn delete_user(db: Data<MongoRepo>, path: web::Path<String>) -> HttpRe
       if res.deleted_count == 1 {
         return HttpResponse::Ok().json(
           Response::new(
-            Status::new(Status::OK),
+            Status::OK(200),
             None::<User>,
             String::from("User successfully deleted!"),
-            Status::new(Status::OK),
+            Status::OK(200),
           )
         )
       } else {
         return HttpResponse::Ok().json(
           Response::new(
-            Status::new(Status::INTERNAL_SERVER_ERROR),
+            Status::INTERNAL_SERVER_ERROR(500),
             None::<User>,
             String::from("User with specified ID not found!"),
-            Status::new(Status::INTERNAL_SERVER_ERROR),
+            Status::INTERNAL_SERVER_ERROR(500),
           )
         )
       }
     }
     Err(err) => HttpResponse::InternalServerError().json(
       Response::new(
-        Status::new(Status::INTERNAL_SERVER_ERROR),
+        Status::INTERNAL_SERVER_ERROR(500),
         None::<User>,
         err.to_string(),
-        Status::new(Status::INTERNAL_SERVER_ERROR),
+        Status::INTERNAL_SERVER_ERROR(500),
       )
     )
   }
